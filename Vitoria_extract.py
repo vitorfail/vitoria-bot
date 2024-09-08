@@ -206,16 +206,18 @@ class Pesquisa_perfil:
             lista_de_seguidores = []
             count =self.carregar_indice()
 
-            for seg in range(count, len(self.array_de_seguidores)):
+            for seg in range(count, len(self.array_de_seguidores)-1):
                 count=count+1
                 self.atualizr_index("index.json", "start")
                 time.sleep(self.generate_random_float(1, 5, 1))
                 user = self.api.user_info(self.array_de_seguidores[count]['id'])
                 if 'contact_phone_number' in user['user']:
-                    print(user['user']['full_name'] +'e'+ user['user']['contact_phone_number'])
-                    numeros["num"].append([user['user']['full_name'], user['user']['contact_phone_number']])
-                    time.sleep(0.5)
-                    lista_de_seguidores.append(user['user']['contact_phone_number'])
+                    if(user['user']['contact_phone_number']!= ""):
+                        print(user['user']['full_name'] +'e'+ user['user']['contact_phone_number'])
+                        numeros["num"].append([user['user']['full_name'], user['user']['contact_phone_number']])
+                        time.sleep(0.5)
+                        lista_de_seguidores.append(user['user']['contact_phone_number'])
+                time.sleep(0.3)
             self.atualizr_index("index.json", "end")
             self.atualizar_numero(numeros)
         except ClientChallengeRequiredError as er:
