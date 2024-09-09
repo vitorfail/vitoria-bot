@@ -43,8 +43,8 @@ class LoginApp:
         # Certificar-se de que a pasta existe
         if not os.path.exists(self.appdata_path):
             os.makedirs(self.appdata_path)
+        #Lado direito
 
-        #carregar e exibir o usuário se tiver 
         self.frame_right = tk.Frame(self.root, bg="white")
         self.frame_right.pack(side="left", fill="both", expand=True)
 
@@ -105,6 +105,8 @@ class LoginApp:
         self.option_menu.grid(row=0, column=0, padx=10, pady=10)
         self.button_seach = ttk.Button(self.right_header, text="Extrair", command=self.iniciar_atualizacao)
         self.button_seach.grid(row=0,  column=2, padx=10, pady=10, sticky="ew")
+        self.numeric_spinbox = tk.Spinbox(self.right_header, from_=0, to=10000000)  # Valores de 0 a 100
+        self.numeric_spinbox.grid(row=0,  column=3, padx=10, pady=10, sticky="ew")
 
 
         original_image = Image.open("phone.png")  # Substitua pelo caminho da sua imagem
@@ -190,7 +192,7 @@ class LoginApp:
             self.tree.delete(*self.tree.get_children())
             while self.rodando: 
                 for seguidor in seguidores:
-                    if len(lista) ==500 or self.rodando ==False:
+                    if len(lista) >=self.numeric_spinbox.get() or self.rodando ==False:
                         break
                     else:
                         index_json ={"id":"","user":""}
