@@ -196,7 +196,7 @@ class Pesquisa_perfil:
                     '__value__': codecs.encode(python_object, 'base64').decode()}
         raise TypeError(repr(python_object) + ' is not JSON serializable')
 
-    def pegar_numeros(self):
+    def pegar_numeros(self, callback):
         numeros = self.pegar_lista_num()
         try:
             print("Pesquisando os numeros aguarde..")
@@ -215,6 +215,7 @@ class Pesquisa_perfil:
                     if(user['user']['contact_phone_number']!= ""):
                         print(user['user']['full_name'] +'e'+ user['user']['contact_phone_number'])
                         numeros["num"].append([user['user']['full_name'], user['user']['contact_phone_number']])
+                        callback(user['user']['full_name'],  user['user']['contact_phone_number'])
                         time.sleep(0.5)
                         lista_de_seguidores.append(user['user']['contact_phone_number'])
                 time.sleep(0.3)
