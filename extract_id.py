@@ -4,15 +4,10 @@ import os
 import json
 
 # Crie uma instância do Instaloader
-def extract_user(target):
+def extract_user():
     L = instaloader.Instaloader()
-    user = None
-    appdata_path = os.path.join(os.getenv('LOCALAPPDATA'), 'vitoria_dados')
-    file_path = os.path.join(appdata_path, 'login.json')
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-        if data.get('username') !=None or data.get('password')!=None:
-            user = data.get('username')
+    user = "vitor_andrademanoel04"
+ 
 
 
     # Faça login (opcional, se precisar acessar perfis privados)
@@ -20,7 +15,7 @@ def extract_user(target):
 
 
     # Carregue um perfil
-    profile = instaloader.Profile.from_username(L.context, target)
+    profile = instaloader.Profile.from_username(L.context, "breno_fons")
     # Exiba algumas informações do perfil
     #print(s)
     seguidores = profile.get_followees()
@@ -28,6 +23,7 @@ def extract_user(target):
     lista = []
 
     for seguidor in seguidores:
+        seguidor.username
         if len(lista) ==500:
             break
         else:
@@ -44,3 +40,4 @@ def extract_user(target):
                 print("deu erro")
     with open('seguidores.json', 'w') as file:
         json.dump(lista, file, indent=4)
+extract_user()

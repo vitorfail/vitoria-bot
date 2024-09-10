@@ -170,15 +170,18 @@ class LoginApp:
         L = instaloader.Instaloader()
         user = None
         file_path = os.path.join(self.appdata_path, 'login.json')
-            
+        self.mostrar_popup()
         with open(file_path, 'r') as file:
             data = json.load(file)
             if data.get('username') !=None or data.get('password')!=None:
                 user = data.get('username')
 
-
+        if os.path.isfile("1_session"):
+            L.load_session_from_file(user,"1_session")
+        else:
+            Login(self.username, self.password)
+            L.load_session_from_file(user,"1_session")
         # Faça login (opcional, se precisar acessar perfis privados)
-        L.load_session_from_file(user,"1_session")
 
 
         # Carregue um perfil
@@ -187,12 +190,11 @@ class LoginApp:
             # Exiba algumas informações do perfil
             #print(s)
             seguidores = profile.get_followees()
-
             lista = []
             self.tree.delete(*self.tree.get_children())
             while self.rodando: 
                 for seguidor in seguidores:
-                    if len(lista) >=self.numeric_spinbox.get() or self.rodando ==False:
+                    if len(lista) >=int(self.numeric_spinbox.get()) or self.rodando ==False:
                         break
                     else:
                         index_json ={"id":"","user":""}
@@ -365,8 +367,9 @@ class LoginApp:
             print(f"Ocorreu um erro: {e}")
         finally:
             # Opcional: Fechar o navegador após o login
-            time.sleep(20)  # Dê tempo para observar o resultado antes de fechar
+            time.sleep(2)  # Dê tempo para observar o resultado antes de fechar
             driver.quit()
+            function()
 if __name__ == "__main__":
     root = tk.Tk()
     app = LoginApp(root)
