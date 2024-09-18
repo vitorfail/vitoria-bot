@@ -3,7 +3,7 @@ import instaloader
 
 def Login(user, senha):
     if user == "" or user == None or senha =="" or senha ==None:
-        return 3
+        return 0
     else:
         try:
             # Crie uma instância do Instaloader        
@@ -16,4 +16,10 @@ def Login(user, senha):
             L.save_session_to_file("1_session")
             return 1
         except Exception as err:
-            return 2
+            print(err)
+            if str(err).find("Checkpoint") != -1:
+                return 2
+            if str(err).find("Wrong") != -1:
+                return 3
+            else:
+                return 4

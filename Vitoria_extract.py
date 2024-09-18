@@ -71,14 +71,12 @@ class Pesquisa_perfil:
                 self.api = AppClient(username=user, password=senha,settings=cached_settings,on_login=lambda x: self.armazenar_login(x, settings_file))
                 print(self.api.current_user())
             except Exception as e:
-                if str(e).find("login") != -1:
+                print(e)
+                if str(e).find("login") != -1 or str(e).find("challenge") != -1:
                     print("Vamos exectuar um novo login")
                     os.remove("ig_session.json")
                     time.sleep(3)
                     self.__init__(self.t, self.u, self.s)
-                    self.pegar_numeros()
-                if str(e).find("challenge") != -1:
-                    self.contingencia1()
 
     def contingencia2(self):
         url = f"https://i.instagram.com/challenge/?next=/api/v1/users/{self.target}/usernameinfo/"
@@ -121,7 +119,7 @@ class Pesquisa_perfil:
         botao_login.click()
         wait = WebDriverWait(driver, 20)
         span_ignorar = wait.until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, '[role="button"]'))
+            EC.element_to_be_clickable((By.XPATH, '//span[text()="Ignorar"]'))
         )
         # Clicar no botão "ignorar"
         span_ignorar.click()
@@ -196,8 +194,12 @@ class Pesquisa_perfil:
                     '__value__': codecs.encode(python_object, 'base64').decode()}
         raise TypeError(repr(python_object) + ' is not JSON serializable')
 
-    def pegar_numeros(self, callback):
-        numeros = self.pegar_lista_num()
+    def pegar_numeros(self, callback, callback2, check):
+        numeros = {"num":[]}
+        if check ==True:
+            numeros = self.pegar_lista_num()
+        if check ==False:
+            self.atualizar_numero(numeros)
         try:
             print("Pesquisando os numeros aguarde..")
             with open("seguidores.json", 'r') as file:
@@ -205,27 +207,32 @@ class Pesquisa_perfil:
                 print("Carregamento Concluido!")
             lista_de_seguidores = []
             count =self.carregar_indice()
-
+            print(len(self.array_de_seguidores)-1)
+            print(count)
             for seg in range(count, len(self.array_de_seguidores)-1):
-                count=count+1
+                callback2()
                 self.atualizr_index("index.json", "start")
-                time.sleep(self.generate_random_float(1, 5, 1))
-                user = self.api.user_info(self.array_de_seguidores[count]['id'])
+                user = self.api.user_info(self.array_de_seguidores[seg]['id'])
                 if 'contact_phone_number' in user['user']:
                     if(user['user']['contact_phone_number']!= ""):
                         print(user['user']['full_name'] +'e'+ user['user']['contact_phone_number'])
                         numeros["num"].append([user['user']['full_name'], user['user']['contact_phone_number']])
                         callback(user['user']['full_name'],  user['user']['contact_phone_number'])
-                        time.sleep(0.5)
                         lista_de_seguidores.append(user['user']['contact_phone_number'])
+                    time.sleep(self.generate_random_float(1, 4, 1))
                 time.sleep(0.3)
             self.atualizr_index("index.json", "end")
             self.atualizar_numero(numeros)
+            return 1
         except ClientChallengeRequiredError as er:
             print("deu erro1")
             self.atualizar_numero(numeros)
-            os.remove("ig_session.json")
-            print(err)
+            print(er)
+            if str(er).find("challenge") != -1:
+                self.contingencia1()
+                time.sleep(0.8)
+                self.pegar_numeros(callback, callback2, True)
+
         except ClientThrottledError as err:
             print("deu erro2")
             self.atualizar_numero(numeros)
@@ -250,12 +257,22 @@ class Pesquisa_perfil:
             self.atualizar_numero(numeros)
             if str(err).find("login") != -1:
                 self.login(self.u, self.s)
+                time.sleep(0.8)
+                self.pegar_numeros(callback,callback2 , True)
             if str(err).find("Unauthorized:") != -1:
                 os.remove("ig_session.json")
                 self.login(self.u, self.s)
+                time.sleep(0.8)
+                self.pegar_numeros(callback,callback2, True)
             if str(err).find("challenge") != -1:
                 self.contingencia1()
-                self.pegar_numeros()
+                time.sleep(0.8)
+                self.pegar_numeros(callback,callback2, True)
+            if str(err).find("feedback_required") != -1:
+                self.contingencia1()
+                time.sleep(0.8)
+                self.pegar_numeros(callback,callback2, True)
+
     def carregar_indice(self):
         try:
             with open("index.json", 'r') as file:
