@@ -232,13 +232,21 @@ class LoginApp:
                 L.load_session_from_file(user,"1_session")
             else:
                 result = Login(self.username, self.password)
+                print("fez o login")
                 time.sleep(1)
                 if result ==1:
                     L.load_session_from_file(user,"1_session")
+                if result ==2:
+                    self.contingencia(self.entry_right.get(), self.extrari_usuarios_intaloader)
+
             # Faça login (opcional, se precisar acessar perfis privados)
             # Carregue um perfil
             try:
                 cont= 1
+                contagem = 0
+                with open("index.json", "r") as file:
+                    j =json.load(file)
+                    contagem = j["index"]
                 profile = instaloader.Profile.from_username(L.context, self.entry_right.get())
                 # Exiba algumas informações do perfil
                 #print(s)
@@ -285,18 +293,23 @@ class LoginApp:
                                     index_json ={"id":"","user":""}
                                     try:
                                         time.sleep(0.7)
-                                        cont+=1
-                                        if cont >=self.usuario_indexador:
-                                            nome = seguidor.username
-                                            index_json["id"] = seguidor.userid
-                                            index_json["user"] = nome
-                                            print(index_json)
-                                            lista.append(index_json)
-                                            self.tree.insert("", "end", values=(cont, index_json["id"], index_json["user"]))
+                                        if cont > contagem:
+                                            time.sleep(0.7)
+                                            cont+=1
+                                            if cont >=self.usuario_indexador:
+                                                nome = seguidor.username
+                                                index_json["id"] = seguidor.userid
+                                                index_json["user"] = nome
+                                                print(index_json)
+                                                lista.append(index_json)
+                                                self.tree.insert("", "end", values=(cont, index_json["id"], index_json["user"]))
+                                                valor_barra = self.progress["value"]
+                                                self.progress["value"] =valor_barra+1
+                                                with open('seguidores.json', 'w') as file:
+                                                    json.dump(lista, file, indent=4)
+                                        else:
                                             valor_barra = self.progress["value"]
                                             self.progress["value"] =valor_barra+1
-                                            with open('seguidores.json', 'w') as file:
-                                                json.dump(lista, file, indent=4)
                                     except Exception as ja_nao_sei_o_que_e:
                                         print(ja_nao_sei_o_que_e)
                                         self.salvar_usuario_atual({"id":cont})

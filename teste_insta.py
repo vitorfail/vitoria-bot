@@ -1,6 +1,4 @@
 import requests
-import zstandard as zstd
-import undetected_chromedriver as uc
 import json
 import time
 from selenium.webdriver.common.by import By
@@ -85,3 +83,24 @@ class Vitoria:
         response = requests.get(url, headers=headers)
 
         print(response.content)
+    def pegar_id(self, user):
+        url = f"https://i.instagram.com/api/v1/users/web_profile_info/?username={user}"  # Substitua pela URL desejada
+        coockies = self.login()
+        headers = {
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",  # Adicione um valor apropriado
+            "Priority": "u=1, i",
+            "Sec-CH-UA": '"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"',
+            "Sec-CH-UA-Mobile": "?1",
+            "Sec-CH-UA-Platform": '"Android"',
+            "Sec-Fetch-Dest": "empty",
+            "Cookie": coockies,
+            "User-Agent": "Instagram 123.0.0.0 (iPhone; iOS 14.0; Scale/3.00)"
+        }
+
+        # Inicializando o navegador
+        response = requests.get(url, headers=headers)
+        print(response.headers)
+        #user_id = response.json()['graphql']['user']['id']
+        #return user_id
