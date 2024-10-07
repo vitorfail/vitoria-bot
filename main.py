@@ -248,6 +248,7 @@ class LoginApp:
                     j =json.load(file)
                     contagem = j["index"]
                 profile = instaloader.Profile.from_username(L.context, self.entry_right.get())
+                profile._metadata()
                 # Exiba algumas informações do perfil
                 #print(s)
                 self.usuario_indexador = 0
