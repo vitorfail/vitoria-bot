@@ -2,13 +2,13 @@ from teste_insta import Vitoria
 import json
 import time
 import random
-vitoria_bot = Vitoria("EstherAlbuquerque610", "dPcV21L3gr0")
+vitoria_bot = Vitoria("EdileusaGila266", "MLmzxMRM87A")
 resultado = vitoria_bot.login()
 
 #luna = vitoria_bot.login_2()
 #id = vitoria_bot.pegar_id("mr.deliveryy")
 #print(id)
-#seguidores = vitoria_bot.pegar_seguidores(id, 20000)
+#seguidores = vitoria_bot.pegar_seguidores(id, 20000, "mr.deliveryy")
 lista_seguidores =[]
 lista_numeros = []
 cont =0
@@ -28,7 +28,11 @@ for seg in lista_seguidores:
         lista_numeros.append(seguidores)
         with open("index_contato.json", "w") as file:
             json.dump({"cont":cont}, file, indent=4)
-    except Exception:
-        print("deu erro")
         with open("user_contact.json", "w") as file:
             json.dump({"num":lista_numeros}, file,indent=4 )
+
+    except Exception as ex:
+        print(f"deu erro:{ex}")
+        with open("user_contact.json", "w") as file:
+            json.dump({"num":lista_numeros}, file,indent=4 )
+            

@@ -132,10 +132,12 @@ class Vitoria:
 
         # Inicializando o navegador
         response = requests.get(url, headers=headers)
-        print(response.content)
         json_convertido = json.loads(response.content.decode('utf-8'))
-        print([json_convertido["user"]["public_phone_number"], json_convertido["user"]["public_email"]])
-        return [json_convertido["user"]["public_phone_number"], json_convertido["user"]["public_email"]]
+        if "public_phone_number" in json_convertido["user"] or "public_email" in json_convertido["user"]:
+            print([json_convertido["user"]["public_phone_number"], json_convertido["user"]["public_email"]])
+            return [json_convertido["user"]["public_phone_number"], json_convertido["user"]["public_email"]]
+        else:
+            return ["", ""]
     def pegar_id(self, user):
         url = f"https://i.instagram.com/api/v1/users/web_profile_info/?username={user}"  # Substitua pela URL desejada
         headers = {
@@ -154,7 +156,7 @@ class Vitoria:
         json_convertido = json.loads(response.content.decode('utf-8'))
         return json_convertido["data"]["user"]["id"]
 
-    def pegar_seguidores(self, id, quantidade):
+    def pegar_seguidores(self, id, quantidade,username):
         lista_seguidores = []
         with open("seguidores.json", "r") as file:
             jss = json.load(file)
@@ -171,18 +173,18 @@ class Vitoria:
             index_pages = jsss["page"]
 
         index_page = None
-        url1 = f"https://www.instagram.com/api/v1/friendships/{id}/followers/?count=12&search_surface=follow_list_page"
+        url1 = f"https://www.instagram.com/graphql/query/?query_hash=37479f2b8209594dde7facb0d904896a&variables=%7B%22id%22:%22{id}%22,%22first%22:50,%22after%22:%22%22%7D"
         coockies = self.login()
         headers = {
-                "Accept": "application/json, text/plain, */*",
-                "Accept-Encoding": "gzip, deflate, br, zstd",
-                "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",  # Adicione um valor apropriado
-                "Priority": "u=1, i",
-                "Sec-CH-UA": '"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"',
-                "Sec-CH-UA-Mobile": "?1",
-                "Sec-CH-UA-Platform": '"Android"',
-                "Cookie": coockies,
-                "User-Agent": "Instagram 123.0.0.0 (iPhone; iOS 14.0; Scale/3.00)"
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",  # Adicione um valor apropriado
+            "Priority": "u=1, i",
+            "sec-fetch-dest":"empty",
+            "sec-fetch-mode":"cors",
+            "Cookie": coockies,
+            "referer":f"https://www.instagram.com/{username}/",
+            "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
         }
         response = requests.get(url1, headers=headers)
         json_convertido = json.loads(response.content.decode('utf-8'))
@@ -195,10 +197,12 @@ class Vitoria:
             if  json_convertido["message"] == "challenge":
                 print("sem tentar")
             if json_convertido["message"] == 'feedback_required':
-                print(json_convertido)
+                print("teste")
         else:
-            for seguidores in json_convertido["users"]:
-                lista_seguidores.append([seguidores["pk"], seguidores["username"]])
+            json_seguidores = json_convertido["data"]["user"]["edge_followed_by"]["edges"]
+            max_id = json_convertido["data"]["user"]["edge_followed_by"]["page_info"]["end_cursor"]
+            for seguidores in json_seguidores:
+                lista_seguidores.append([seguidores["node"]["id"], seguidores["node"]["username"]])
                 cont+=1
         with open("seguidores.json", "w") as file:
                 json.dump(lista_seguidores,file,indent=4)
@@ -206,28 +210,27 @@ class Vitoria:
         while cont<quantidade:
             delay = random.uniform(2, 4)
             time.sleep(delay)
-            url2 = f"https://www.instagram.com/api/v1/friendships/{id}/followers/?count=12&max_id={max_id}&search_surface=follow_list_page"
+            url2 = f"https://www.instagram.com/graphql/query/?query_hash=37479f2b8209594dde7facb0d904896a&variables=%7B%22id%22:%22{id}%22,%22first%22:50,%22after%22:%22{max_id}%22%7D"
             # Inicializando o navegador
             response = requests.get(url2, headers=headers)
             json_convertido = json.loads(response.content.decode('utf-8'))
             print(json_convertido.keys())
             if "message" in json_convertido:
-                print(json_convertido)
                 if json_convertido["message"] == 'Aguarde alguns minutos antes de tentar novamente.':
                     self.logout()
                     time.sleep(0.1)
                     self.login()
                     self.pegar_seguidores(id)
                 if json_convertido["message"] == 'feedback_required':
-                    print(json_convertido)
+                    print("passou aqui")
  
             else:
-                max_id = json_convertido["next_max_id"]
-                index_pages = index_pages+12
-                for seguidores in json_convertido["users"]:
-                    lista_seguidores.append([seguidores["pk"], seguidores["username"]])
+                json_seguidores = json_convertido["data"]["user"]["edge_followed_by"]["edges"]
+                max_id = json_convertido["data"]["user"]["edge_followed_by"]["page_info"]["end_cursor"]
+                for seguidores in json_seguidores:
+                    lista_seguidores.append([seguidores["node"]["id"], seguidores["node"]["username"]])
                     cont+=1
-                    print([seguidores["pk"], seguidores["username"]])
+                    print([seguidores["node"]["id"], seguidores["node"]["username"]])
                     print(cont)
             with open("index_pages.json", "w") as file:
                 json.dump({"page":index_pages},file,indent=4)
