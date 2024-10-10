@@ -115,6 +115,7 @@ class Vitoria:
         with open("coockie.json", "w") as file:
             json.dump({"coockie": ""}, file, indent=4)
     def pegar_numero(self, id):
+        
         url = f"https://i.instagram.com/api/v1/users/{id}/info/"  # Substitua pela URL desejada
         coockies = self.login()
         headers = {
@@ -133,6 +134,11 @@ class Vitoria:
         # Inicializando o navegador
         response = requests.get(url, headers=headers)
         json_convertido = json.loads(response.content.decode('utf-8'))
+        if "message" in json_convertido:
+            print(json_convertido["message"])
+            self.logout()
+            self.login()
+            return ["",""]
         if "public_phone_number" in json_convertido["user"] or "public_email" in json_convertido["user"]:
             print([json_convertido["user"]["public_phone_number"], json_convertido["user"]["public_email"]])
             return [json_convertido["user"]["public_phone_number"], json_convertido["user"]["public_email"]]
