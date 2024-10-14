@@ -58,10 +58,12 @@ class Vitoria:
                     time.sleep(6)
             if checkout_ignorar>0:
                 ignorar2 = driver.find_element(By.XPATH, '//span[text()="Ignorar"]')
+                time.sleep(1)
                 ignorar2.click()
             if checkout_capcha>0:
-                print("Faça Checkout do capcha")
                 while checkout_capcha > 0:
+                    checkout_capcha = len(driver.find_elements(By.XPATH, '//span[text()="Ajude-nos a confirmar que é você"]'))
+                    print(f"Faça Checkout do capcha {checkout_capcha}")
                     time.sleep(6)
 
             # Obtém os cookies

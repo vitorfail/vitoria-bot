@@ -3,7 +3,7 @@ import json
 import time
 import random
 import pandas as pd
-vitoria_bot = Vitoria("BetinaAntunes336", "kE6xTH0k5lc")
+vitoria_bot = Vitoria("EdileusaGila266", "MLmzxMRM87A")
 resultado = vitoria_bot.login()
 
 #luna = vitoria_bot.login_2()
